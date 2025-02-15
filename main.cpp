@@ -1,10 +1,8 @@
 #include<iostream>
 #include<SDL2/SDL.h>
 
-#include<GL/gl.h>
-
 #include "global.cpp"
-#include "travelling_dot.cpp"
+#include "dot.cpp"
 
 int main(int argc, char *argv[]) {
   SDL_Init(SDL_INIT_EVERYTHING);
@@ -21,15 +19,35 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  travelling_dot(renderer, 0, 0, WIDTH, HEIGHT);
+  bool quit = false;
+
+  std::pair<int,int> position = {WIDTH/2, HEIGHT/2};
 
   SDL_Event windowEvent;
-  while (true) {
+  while (!quit) {
+    render_dot(renderer, position.first, position.second);
+    SDL_Delay(10);
+
     if (SDL_PollEvent(&windowEvent)) {
-      if (SDL_QUIT == windowEvent.type) {
-        break;
+      if (windowEvent.type == SDL_QUIT) {
+        quit = true;
+      } else if (windowEvent.type == SDL_KEYDOWN) {  // need smoother movement controls
+        switch (windowEvent.key.keysym.sym) {
+          case SDLK_UP:
+            position.second-=10;
+            continue;
+          case SDLK_LEFT:
+            position.first-=10;
+            continue;
+          case SDLK_DOWN:
+            position.second+=10;
+            continue;
+          case SDLK_RIGHT:
+            position.first+=10;
+            continue;
+        }
       }
-    }
+    } 
   }
 
   SDL_DestroyWindow(window);
